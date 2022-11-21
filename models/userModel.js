@@ -7,8 +7,7 @@ const UserSchema = new mongoose.Schema({
     name: {
       type: String,
       unique: true,
-      required: [true, 'Please tell us your Office name!'],
-      enum: ['secretary', 'cod', 'dvc', 'vc', 'admin']
+      required: [true, 'Please tell your username'],
     },
     email: {
       type: String,
@@ -19,8 +18,8 @@ const UserSchema = new mongoose.Schema({
     },
     role: {
       type: String,
-      enum: ['office', 'admin'],
-      default: 'office'
+      enum: ['school', 'student', 'teacher', 'admin'],
+      default: 'student'
     },
     password: {
       type: String,
@@ -52,5 +51,5 @@ const UserSchema = new mongoose.Schema({
 
   const User = mongoose.model('User', UserSchema);
   
-  module.exports = Office;
+  module.exports = Users;
   
