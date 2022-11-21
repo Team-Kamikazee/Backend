@@ -15,7 +15,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 
-export const AuthContext = createContext<GlobalType | null>(null);
+export const AuthContext = createContext(null);
 
 //provide children with access to context
 export const useAuth = () => {
@@ -32,7 +32,7 @@ export default AuthProvider;
 
 //hook to create auth object handle states
 export const useProvideAuth = () => {
-  const [user, setUser] = useState<object | null | boolean>(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
 
