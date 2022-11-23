@@ -1,8 +1,20 @@
-import express from 'express'
-import {GetAllUsers} from '../controllers/userController'
+import express from 'express';
+import {
+  getAllUsers,
+  addUser,
+  searchUser,
+  login,
+} from '../controllers/userController';
 const router = express.Router();
 
+// get all users
+router.get('/', getAllUsers);
+router.post('/login', login);
 
-router.get('/',GetAllUsers)
+// add any user by passing their details and role
+router.post('/', addUser);
 
-module.exports = router;
+// retrieve a user by either uuid or id
+router.get('/search', searchUser);
+
+export default router;
