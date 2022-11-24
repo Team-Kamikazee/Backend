@@ -102,7 +102,7 @@ export const addExpenditure = async (req, res) => {
       'amount',
       'date',
       'invoiceNumber',
-      'vendorName',
+      'vendorName'
     );
 
     const photo = await uploadFile(image, 'expenditures');
