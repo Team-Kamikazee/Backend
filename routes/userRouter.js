@@ -4,6 +4,7 @@ import {
   addUser,
   searchUser,
   login,
+  getStudent,
 } from '../controllers/userController';
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.post('/', addUser);
 
 // retrieve a user by either uuid or id
 router.get('/search', searchUser);
+router.get('/:studentUUID', getStudent);
 
 export default router;

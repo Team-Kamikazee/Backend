@@ -46,8 +46,17 @@ export const addUser = async (req, res) => {
       passwordConfirm: hash,
     };
 
-    if (role === 'STUDENT')
+    if (role === 'STUDENT') {
       newUser.sponsorship = req.body.sponsorship || 'SELF';
+      newUser.familyAnnualIncome = req.body.familyAnnualIncome;
+      newUser.disability = req.body.disability;
+      newUser.siblings = req.body.siblings;
+      newUser.distance = req.body.distance;
+      newUser.transportFacility = req.body.transportFacility;
+      newUser.toiletFacility = req.body.toiletFacility;
+      newUser.drinkingWater = req.body.drinkingWater;
+      newUser.pregnancy = req.body.pregnancy;
+    }
 
     const user = await User.create(newUser);
 
@@ -106,6 +115,68 @@ export const login = async (req, res) => {
     return res.status(200).json({
       user: rest,
       token,
+    });
+  } catch (error) {
+    console.log({ error });
+    return res.status(400).json({
+      message: 'Internal server error',
+      success: false,
+    });
+  }
+};
+
+export const getStudent = async (req, res) => {
+  try {
+    const { studentUUID } = req.params;
+
+    const student = await User.findOne({
+      uuid: studentUUID,
+    });
+
+    if (isNil(student))
+      return res.status(404).json({
+        message: "This student doesn't exist",
+        success: false,
+      });
+
+    let count = 0;
+
+    if (student.gender === 'MALE') count += 1;
+    else count += 2;
+
+    if (student.disability === 'true') count += 5;
+
+    if (student.familyIncome > 200000) count += 4;
+
+    if (student.scholarship === 'SELF') count += 2;
+    if (student.scholarship === 'GOVERNMENT') count += 1.5;
+    if (student.scholarship === 'OTHER') count += 1.5;
+
+    if (student.transportFacility === 'true') count += 1.5;
+
+    if (student.transportFacility === 'false') count += 5;
+
+    if (student.siblings > 2) count += 2;
+
+    if (student.toiletFacility === 'true') count += 1.5;
+    else count += 5;
+
+    if (student.distance > 10) count += 5;
+    else count += 1.5;
+
+    if (student.pregnancy === 'true') count += 5;
+    else count += 1.5;
+
+    const dropOutIndex = (count / 46) * 100;
+
+    const { password, passwordConfirm, ...rest } = student._doc;
+
+    return res.status(200).json({
+      message: 'success',
+      student: {
+        ...rest,
+        dropOutIndex,
+      },
     });
   } catch (error) {
     console.log({ error });

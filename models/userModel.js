@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -54,6 +53,30 @@ const UserSchema = new mongoose.Schema({
   sponsorship: {
     type: String,
     enum: ['SCHOLARSHIP', 'SELF', 'GOVERNMENT'],
+  },
+  familyAnnualIncome: {
+    type: String,
+  },
+  disability: {
+    type: Boolean,
+  },
+  siblings: {
+    type: Number,
+  },
+  distance: {
+    type: Number,
+  },
+  transportFacility: {
+    type: String,
+  },
+  toiletFacility: {
+    type: String,
+  },
+  drinkingWater: {
+    type: String,
+  },
+  pregnancy: {
+    type: String,
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
