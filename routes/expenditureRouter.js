@@ -1,8 +1,15 @@
-import express from 'express'
-import { addExpenditure } from '../controllers/expenditureController';
+import express from 'express';
+import {
+  addExpenditure,
+  getAllExpenditures,
+} from '../controllers/expenditureController';
+import multer from 'multer';
+
+const upload = multer({ dest: 'uploads/' });
+
 const router = express.Router();
 
+router.post('/', upload.single('photo'), addExpenditure);
+router.get('/', getAllExpenditures);
 
-router.post('/',addExpenditure)
-
-export default router
+export default router;

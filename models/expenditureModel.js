@@ -13,9 +13,18 @@ const ExpenditureSchema = new mongoose.Schema({
   amount: {
     type: Number,
   },
-    photo : { 
-        type:String,
-    }
+  photo: {
+    type: String,
+  },
+  invoiceNumber: {
+    type: String,
+  },
+  vendorName: {
+    type: String,
+  },
+  uuid: {
+    type: String,
+  },
 });
 
 const Expenditure = mongoose.model('Expenditure', ExpenditureSchema);

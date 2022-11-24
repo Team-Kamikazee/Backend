@@ -4,6 +4,8 @@ import Expenditure from '../models/expenditureModel';
 import fs from 'fs';
 import util from 'util';
 import S3 from 'aws-sdk/clients/s3';
+import moment from 'moment';
+import uuid from 'uuid4';
 
 const multerStorage = multer.memoryStorage();
 
@@ -49,42 +51,39 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 export const uploadFile = async (files, folder) => {
-  const AWS_BUCKET_NAME = 'bluescope-property-images';
-  const AWS_REGION = 'EU (Paris) eu-west-3';
-  const SPACES_ENDPOINT = 'ams3.digitaloceanspaces.com';
-  const AWS_ACCESS_KEY = 'AKIA5FDWB6UI7HV557XV';
-  const AWS_SECRET_KEY = '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';
+  const S3_BUCKET_NAME = 'vsas';
+  const S3_ENDPOINT = 'https://eu-central-1.linodeobjects.com';
+  const S3_REGION = 'eu-central-1';
+  const S3_ACCESS_KEY_ID = 'VCFPYVWG6K7AR54D632Q';
+  const S3_SECRET_KEY = 'nzJWh3iEqJ4wCBAyOcc4Kmc7dwf6LAKGhIXLnD2c';
 
   const unlinkFile = util.promisify(fs.unlink);
   try {
-    const region = AWS_REGION;
-    const accessKeyId = AWS_ACCESS_KEY;
-    const secretAccessKey = AWS_SECRET_KEY;
-    const s3 = new S3({ region, accessKeyId, secretAccessKey });
+    const region = S3_REGION;
+    const endpoint = S3_ENDPOINT;
+    const accessKeyId = S3_ACCESS_KEY_ID;
+    const secretAccessKey = S3_SECRET_KEY;
+    const config = { region, endpoint, accessKeyId, secretAccessKey };
+    const s3 = new S3(config);
+    const ACL = 'public-read';
 
     console.log('Uploading ::::> ', files);
     const fileStream = await fs.createReadStream(files.path);
 
     const uploadParams = {
-      Bucket: config.AWS_BUCKET_NAME,
+      Bucket: S3_BUCKET_NAME,
       Body: fileStream,
+      ACL,
       Key: `${folder}/${files.originalname}`,
-      ContentType: files[i].mimetype,
+      ContentType: files.mimetype,
     };
 
-    const result = await s3
-      .upload(uploadParams)
-      .promise()
-      .then(async (result) => {
-        await unlinkFile(files.path);
-        return result;
-      })
-      .catch(async (error) => {
-        throw error;
-      });
+    const uploaded = await s3.upload(uploadParams).promise();
 
-    return result.Location;
+    return uploaded.Location;
   } catch (error) {
+    console.log({ error });
+    throw error;
     // Cache files that were not uploaded
     // for (let i = 0; i < files.length; i++) {
     //   await unlinkFile(files[i].path);
@@ -93,22 +92,25 @@ export const uploadFile = async (files, folder) => {
 };
 
 export const addExpenditure = async (req, res) => {
-    try {
-        const image = req.file;
+  try {
+    const image = req.file;
 
-        console.log({image});
-        console.log(req.body);
-        const filteredBody = filterObj(
-            req.body,
-            'name',
-            'description',
-            'amount',
-            'date',
-          );
+    const filteredBody = filterObj(
+      req.body,
+      'name',
+      'description',
+      'amount',
+      'date',
+      'invoiceNumber',
+      'vendorName',
+    );
 
-        
-          //2b) Filtered out unwanted fields names that are not allowed to be updated
-          if (req.file) filteredBody.photo = req.file.filename;
+    const photo = await uploadFile(image, 'expenditures');
+    //2b) Filtered out unwanted fields names that are not allowed to be updated
+    if (req.file) filteredBody.photo = photo;
+
+    filteredBody.date = moment(filteredBody.date).format('YYYY-MM-DD');
+    filteredBody.uuid = uuid();
 
     const newExpenditure = await Expenditure.create(filteredBody);
 
@@ -126,26 +128,25 @@ export const addExpenditure = async (req, res) => {
   });
 };
 
-
 export const getAllExpenditures = async (req, res) => {
-    try {
-      const expenditures = await Expenditure.find({});
+  try {
+    const expenditures = await Expenditure.find({});
 
-      if (expenditures.length === 0) {
-        return res.status(404).json({
-          message: 'Not Found, Add some',
-        });
-      }
-
-      return res.status(200).json({
-        message: 'success',
-        expenditures,
-      });
-    } catch (err) {
-      console.log(err);
-      return res.status(400).json({
-        message: 'Internal server error',
-        success: false,
+    if (expenditures.length === 0) {
+      return res.status(404).json({
+        message: 'Not Found, Add some',
       });
     }
-  };
+
+    return res.status(200).json({
+      message: 'success',
+      expenditures,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      message: 'Internal server error',
+      success: false,
+    });
+  }
+};

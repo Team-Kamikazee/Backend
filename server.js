@@ -1,12 +1,12 @@
-import * as dotenv from 'dotenv' 
-import mongoose from 'mongoose'
-dotenv.config({path:'./config.env'})
+import * as dotenv from 'dotenv';
+import mongoose from 'mongoose';
+dotenv.config({ path: './config.env' });
 
-import app from './app.js'
-const DB = process.env.DB
+import app from './app.js';
+const DB = process.env.DB;
 
 // !Dont Move this function
-process.on('uncaughtException', err => {
+process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
   console.log(err.name, err.message);
   process.exit(1);
@@ -18,12 +18,12 @@ mongoose
   })
   .then(() => console.log('DB connection successful!'));
 
-const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT,()=> {
-    console.log(`App running on port : ${PORT}`)
-})
+const PORT = 3000;
+const server = app.listen(PORT, () => {
+  console.log(`App running on port : ${PORT}`);
+});
 
-process.on('unhandledRejection', err => {
+process.on('unhandledRejection', (err) => {
   console.log('UNHANDLED REJECTION! 💥 Shutting down...');
   console.log(err.name, err.message);
   server.close(() => {
@@ -37,4 +37,3 @@ process.on('SIGTERM', () => {
     console.log('💥 Process terminated!');
   });
 });
-
