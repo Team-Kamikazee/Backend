@@ -30,21 +30,26 @@ export const getAllUsers = async (req, res) => {
 // As a school admin, I should be able to register new teachers
 export const addUser = async (req, res) => {
   try {
-    const { name, email, password, passwordConfirm, gender, role, age } =
+    const { name, email, password, passwordConfirm, gender, role, dob } =
       req.body;
 
     const hash = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
+    const newUser = {
       name,
       uuid: uuid4(),
       email,
       role,
-      age,
+      dob,
       gender,
       password: hash,
       passwordConfirm: hash,
-    });
+    };
+
+    if (role === 'STUDENT')
+      newUser.sponsorship = req.body.sponsorship || 'SELF';
+
+    const user = await User.create(newUser);
 
     // TODO: if user is a student, assign to a class
     return res.status(201).json({

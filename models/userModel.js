@@ -25,9 +25,9 @@ const UserSchema = new mongoose.Schema({
     enum: ['SCHOOL_ADMIN', 'STUDENT', 'TEACHER', 'ADMIN'],
     default: 'STUDENT',
   },
-  age: {
-    type: Number,
-    required: [true, 'Please tell your username'],
+  dob: {
+    type: String,
+    required: [true, 'Please tell your date of birth'],
   },
   gender: {
     type: String,
@@ -51,7 +51,10 @@ const UserSchema = new mongoose.Schema({
       message: 'Passwords are not the same!',
     },
   },
-
+  sponsorship: {
+    type: String,
+    enum: ['SCHOLARSHIP', 'SELF', 'GOVERNMENT'],
+  },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
