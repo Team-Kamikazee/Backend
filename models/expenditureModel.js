@@ -13,7 +13,9 @@ const ExpenditureSchema = new mongoose.Schema({
   amount: {
     type: Number,
   },
-    photo: [String]
+    photo : { 
+        type:String,
+    }
 });
 
 const Expenditure = mongoose.model('Expenditure', ExpenditureSchema);

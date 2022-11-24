@@ -93,18 +93,22 @@ export const uploadFile = async (files, folder) => {
 };
 
 export const addExpenditure = async (req, res) => {
-  try {
-    const filteredBody = filterObj(
-      req.body,
-      'name',
-      'description',
-      'amount',
-      'date'
-    );
+    try {
+        const image = req.file;
 
-    await uploadFile(req.file, 'expenditures');
-    //2b) Filtered out unwanted fields names that are not allowed to be updated
-    if (req.file) filteredBody.photo = req.file.filename;
+        console.log({image});
+        console.log(req.body);
+        const filteredBody = filterObj(
+            req.body,
+            'name',
+            'description',
+            'amount',
+            'date',
+          );
+
+        
+          //2b) Filtered out unwanted fields names that are not allowed to be updated
+          if (req.file) filteredBody.photo = req.file.filename;
 
     const newExpenditure = await Expenditure.create(filteredBody);
 
@@ -121,3 +125,27 @@ export const addExpenditure = async (req, res) => {
     success: false,
   });
 };
+
+
+export const getAllExpenditures = async (req, res) => {
+    try {
+      const expenditures = await Expenditure.find({});
+
+      if (expenditures.length === 0) {
+        return res.status(404).json({
+          message: 'Not Found, Add some',
+        });
+      }
+
+      return res.status(200).json({
+        message: 'success',
+        expenditures,
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({
+        message: 'Internal server error',
+        success: false,
+      });
+    }
+  };
